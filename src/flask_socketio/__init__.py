@@ -616,7 +616,7 @@ class SocketIO(object):
                               if k in ssl_args and kwargs[k] is not None}
                 for k in ssl_args:
                     kwargs.pop(k, None)
-                if len(ssl_params) > 0:
+                if ssl_params:
                     ssl_params['server_side'] = True  # Listening requires true
                     eventlet_socket = eventlet.wrap_ssl(eventlet_socket,
                                                         **ssl_params)
@@ -771,12 +771,11 @@ class SocketIO(object):
                     raise
                 type, value, traceback = sys.exc_info()
                 return err_handler(value)
-            if not self.manage_session:
-                # when Flask is managing the user session, it needs to save it
-                if not hasattr(session_obj, 'modified') or \
-                        session_obj.modified:
-                    resp = app.response_class()
-                    app.session_interface.save_session(app, session_obj, resp)
+            if not self.manage_session and (
+                not hasattr(session_obj, 'modified') or session_obj.modified
+            ):
+                resp = app.response_class()
+                app.session_interface.save_session(app, session_obj, resp)
             return ret
 
 

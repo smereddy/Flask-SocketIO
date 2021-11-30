@@ -169,11 +169,10 @@ def on_changing_response():
 
 @socketio.on_error()
 def error_handler(value):
-    if isinstance(value, AssertionError):
-        global error_testing
-        error_testing = True
-    else:
+    if not isinstance(value, AssertionError):
         raise value
+    global error_testing
+    error_testing = True
     return 'error'
 
 
@@ -184,11 +183,10 @@ def raise_error(data):
 
 @socketio.on_error('/test')
 def error_handler_namespace(value):
-    if isinstance(value, AssertionError):
-        global error_testing_namespace
-        error_testing_namespace = True
-    else:
+    if not isinstance(value, AssertionError):
         raise value
+    global error_testing_namespace
+    error_testing_namespace = True
     return 'error/test'
 
 
@@ -199,11 +197,10 @@ def raise_error_namespace(data):
 
 @socketio.on_error_default
 def error_handler_default(value):
-    if isinstance(value, AssertionError):
-        global error_testing_default
-        error_testing_default = True
-    else:
+    if not isinstance(value, AssertionError):
         raise value
+    global error_testing_default
+    error_testing_default = True
     return 'error/default'
 
 

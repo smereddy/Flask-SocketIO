@@ -38,11 +38,10 @@ class SocketIOTestClient(object):
                 pkt = packet.Packet(encoded_packet=epkt[0])
                 for att in epkt[1:]:
                     pkt.add_attachment(att)
-            if pkt.packet_type == packet.EVENT or \
-                    pkt.packet_type == packet.BINARY_EVENT:
+            if pkt.packet_type in [packet.EVENT, packet.BINARY_EVENT]:
                 if eio_sid not in self.queue:
                     self.queue[eio_sid] = []
-                if pkt.data[0] == 'message' or pkt.data[0] == 'json':
+                if pkt.data[0] in ['message', 'json']:
                     self.queue[eio_sid].append({
                         'name': pkt.data[0],
                         'args': pkt.data[1],
@@ -52,8 +51,7 @@ class SocketIOTestClient(object):
                         'name': pkt.data[0],
                         'args': pkt.data[1:],
                         'namespace': pkt.namespace or '/'})
-            elif pkt.packet_type == packet.ACK or \
-                    pkt.packet_type == packet.BINARY_ACK:
+            elif pkt.packet_type in [packet.ACK, packet.BINARY_ACK]:
                 self.acks[eio_sid] = {'args': pkt.data,
                                       'namespace': pkt.namespace or '/'}
             elif pkt.packet_type in [packet.DISCONNECT, packet.CONNECT_ERROR]:
@@ -186,10 +184,7 @@ class SocketIOTestClient(object):
         :param namespace: The namespace of the event. The global namespace is
                           assumed if this argument is not provided.
         """
-        if json:
-            msg = 'json'
-        else:
-            msg = 'message'
+        msg = 'json' if json else 'message'
         return self.emit(msg, data, callback=callback, namespace=namespace)
 
     def get_received(self, namespace=None):
